@@ -49,30 +49,6 @@ pub fn new_matrix(x []complex.Complex, dims []int) Matrix {
 	}
 }
 
-/*
-func MakeMatrix(x []complex128, dims []int) *Matrix {
-	length := 1
-	offsets := make([]int, len(dims))
-
-	for i := len(dims) - 1; i >= 0; i-- {
-		if dims[i] < 1 {
-			panic("invalid dimensions")
-		}
-
-		offsets[i] = length
-		length *= dims[i]
-	}
-
-	if len(x) != length {
-		panic("incorrect dimensions")
-	}
-
-	dc := make([]int, len(dims))
-	copy(dc, dims)
-	return &Matrix{x, dc, offsets}
-}
-*/
-
 // new_matrix_2d is a helper function to convert a 2d array to a matrix.
 pub fn new_matrix_2d(x [][]complex.Complex) Matrix {
 	dims := [x.len, x[0].len]
@@ -169,10 +145,10 @@ pub fn (m Matrix) dimensions() []int {
 
 // dim returns the array of any given index of the Matrix.
 // Exactly one value in dims must be -1. This is the array dimension returned.
-// For example, using the Matrix documented in MakeMatrix:
-//   m.Dim([]int {1, 0, -1}) = []complex128 {3, 4, 5, 6}
-//   m.Dim([]int {0, -1, 2}) = []complex128 {3, 7, 1}
-//   m.Dim([]int {-1, 1, 3}) = []complex128 {8, 0}
+// For example, using the Matrix documented in new_matrix:
+//   m.dim([]int {1, 0, -1}) = []complex.Complex {3, 4, 5, 6}
+//   m.dim([]int {0, -1, 2}) = []complex.Complex {3, 7, 1}
+//   m.dim([]int {-1, 1, 3}) = []complex.Complex {8, 0}
 pub fn (m Matrix) dim(dims []int) []complex.Complex {
 	inds := m.indexes(dims)
 	mut r := []complex.Complex{len: inds.len}
@@ -195,13 +171,13 @@ pub fn (mut m Matrix) set_dim(x []complex.Complex, dims []int) {
 }
 
 // value returns the value at the given index.
-// m.Value([]int {1, 2, 3, 4}) is equivalent to m[1][2][3][4].
+// m.value([]int {1, 2, 3, 4}) is equivalent to m[1][2][3][4].
 pub fn (m Matrix) value(dims []int) complex.Complex {
 	return m.list[m.offset(dims)]
 }
 
 // set_value sets the value at the given index.
-// m.SetValue(10, []int {1, 2, 3, 4}) is equivalent to m[1][2][3][4] = 10.
+// m.set_value(10, []int {1, 2, 3, 4}) is equivalent to m[1][2][3][4] = 10.
 pub fn (mut m Matrix) set_value(x complex.Complex, dims []int) {
 	m.list[m.offset(dims)] = x
 }
@@ -223,7 +199,7 @@ pub fn (m Matrix) to_2d() [][]complex.Complex {
 }
 
 // equal_approx returns true if the Matrixes are very close, else false.
-// Comparison done using dsputils.PrettyCloseC().
+// Comparison done using utils.equal_approx_complex().
 pub fn (m Matrix) equal_approx(n Matrix, tol f64) bool {
 	for i, v in m.dims {
 		if v != n.dims[i] {

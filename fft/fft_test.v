@@ -1,7 +1,7 @@
 module fft
 
-import math.complex
 import math
+import math.complex
 import utils
 
 const sqrt2_2 = math.sqrt2 / 2
