@@ -1,6 +1,6 @@
 # dsp
 
-dsp is a digital signal processing package for the [V programming language](https://vlang.io).
+dsp is a digital signal processing module for the [V programming language](https://vlang.io).
 
 ## Modules
 * [utils](utils) - utilities and data structures
