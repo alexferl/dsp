@@ -2,16 +2,20 @@ module fft
 
 import math
 import math.complex
-import runtime
 import sync
+import runtime
 
 [noinit]
 struct Radix2 {
 mut:
 	mu      sync.RwMutex
 	factors map[int][]complex.Complex = {
-		4: [complex.complex(1, 0), complex.complex(0, 1), complex.complex(-1, 0),
-			complex.complex(0, 1)]
+		4: [
+			complex.complex(1, 0),
+			complex.complex(0, -1),
+			complex.complex(-1, 0),
+			complex.complex(0, 1),
+		]
 	}
 }
 
@@ -49,7 +53,7 @@ fn (mut r Radix2) get_factors(input_len int) []complex.Complex {
 					r.factors[i][n] = complex.complex(cos, sin)
 				}
 
-				return r.factors[input_len]
+				continue
 			}
 		}
 	}
@@ -63,14 +67,15 @@ fn (r Radix2) has_factors(idx int) bool {
 }
 
 struct FFTWork {
-	start  int
-	end    int
+	start int
+	end   int
 }
 
 const worker_pool_size = 0
 
 fn (mut r Radix2) fft(x []complex.Complex) []complex.Complex {
 	lx := x.len
+
 	factors := r.get_factors(lx)
 
 	mut t := []complex.Complex{len: lx}
@@ -78,8 +83,8 @@ fn (mut r Radix2) fft(x []complex.Complex) []complex.Complex {
 
 	mut blocks, mut stage, mut s_2 := int(0), int(0), int(0)
 
-	mut ch := sync.new_channel[FFTWork](u32(lx))
-	mut wg := sync.new_waitgroup()
+	// mut ch := sync.new_channel[FFTWork](u32(lx))
+	// mut wg := sync.new_waitgroup()
 
 	mut num_workers := fft.worker_pool_size
 	if num_workers == 0 {
@@ -91,39 +96,40 @@ fn (mut r Radix2) fft(x []complex.Complex) []complex.Complex {
 		idx_diff = 2
 	}
 
-	worker := fn [mut wg, mut ch, stage, s_2, rd, factors, blocks, mut t]() {
-		for {
-			mut work := FFTWork{}
-			if !ch.pop(&work) {
-				break
-			}
-
-			for nb := work.start; nb < work.end; nb += stage {
-				if stage != 2 {
-					for j := 0; j < s_2; j++ {
-						idx := j + nb
-						idx2 := idx + s_2
-						ridx := rd[idx]
-						w_n := rd[idx2] * factors[blocks * j]
-						t[idx] = ridx + w_n
-						t[idx2] = ridx - w_n
-					}
-				} else {
-					n1 := nb + 1
-					rn := rd[nb]
-					rn1 := rd[n1]
-					t[nb] = rn + rn1
-					t[n1] = rn - rn1
-				}
-			}
-		}
-		wg.done()
-	}
-
-	for i := 0; i < num_workers; i++ {
-		spawn worker()
-	}
-	defer { ch.close() }
+	// worker := fn [mut wg, mut ch, stage, s_2, rd, factors, blocks, mut t]() {
+	// 	for {
+	// 		mut work := FFTWork{}
+	// 		if !ch.pop(&work) {
+	// 			break
+	// 		}
+	//
+	// 		for nb := work.start; nb < work.end; nb += stage {
+	// 			if stage != 2 {
+	// 				for j := 0; j < s_2; j++ {
+	// 					idx := j + nb
+	// 					idx2 := idx + s_2
+	// 					ridx := rd[idx]
+	// 					w_n := rd[idx2] * factors[blocks * j]
+	// 					t[idx] = ridx + w_n
+	// 					t[idx2] = ridx - w_n
+	// 				}
+	// 			} else {
+	// 				n1 := nb + 1
+	// 				rn := rd[nb]
+	// 				rn1 := rd[n1]
+	// 				t[nb] = rn + rn1
+	// 				t[n1] = rn - rn1
+	// 			}
+	// 		}
+	// 	}
+	// 	// wg.done()
+	// }
+	//
+	// for i := 0; i < num_workers; i++ {
+	// 	spawn worker()
+	// }
+	//
+	// defer { ch.close() }
 
 	for stage = 2; stage <= lx; stage <<= 1 {
 		blocks = lx / stage
@@ -131,9 +137,28 @@ fn (mut r Radix2) fft(x []complex.Complex) []complex.Complex {
 
 		for start, end := 0, stage; true; {
 			if end - start >= idx_diff || end == lx {
-				wg.add(1)
-				work := FFTWork{start, end}
-				ch.push(&work)
+				// wg.add(1)
+				// work := FFTWork{start, end}
+				// ch.push(&work)
+
+				for nb := start; nb < end; nb += stage {
+					if stage != 2 {
+						for j := 0; j < s_2; j++ {
+							idx := j + nb
+							idx2 := idx + s_2
+							ridx := rd[idx]
+							w_n := rd[idx2] * factors[blocks * j]
+							t[idx] = ridx + w_n
+							t[idx2] = ridx - w_n
+						}
+					} else {
+						n1 := nb + 1
+						rn := rd[nb]
+						rn1 := rd[n1]
+						t[nb] = rn + rn1
+						t[n1] = rn - rn1
+					}
+				}
 
 				if end == lx {
 					break
@@ -145,7 +170,7 @@ fn (mut r Radix2) fft(x []complex.Complex) []complex.Complex {
 			end += stage
 		}
 		// ch.close()
-		wg.wait()
+		// wg.wait()
 		rd = t.clone()
 		t = rd.clone()
 	}
@@ -172,8 +197,7 @@ fn log2(v_ u32) u32 {
 	mut v := v_
 	mut r := u32(0)
 
-	// TODO: change to v >>= 1 when it works
-	for v = v >> 1; v != 0; v >>= 1 {
+	for v >>= 1; v != 0; v >>= 1 {
 		r++
 	}
 
@@ -192,8 +216,7 @@ fn reverse_bits(v_ u32, s_ u32) u32 {
 	r = v & 1
 	s--
 
-	// TODO: change to v >>= 1 when it works
-	for v = v >> 1; v != 0; v >>= 1 {
+	for v >>= 1; v != 0; v >>= 1 {
 		r <<= 1
 		r |= v & 1
 		s--
