@@ -13,14 +13,14 @@ pub fn to_complex(x []f64) []complex.Complex {
 	return y
 }
 
-// is_power_of_2 returns true if x is a power of 2, else false.
-pub fn is_power_of_2(x int) bool {
+// is_power_of_two returns true if x is a power of 2, else false.
+pub fn is_power_of_two(x int) bool {
 	return x & (x - 1) == 0
 }
 
-// next_power_of_2 returns the next power of 2 >= x.
-pub fn next_power_of_2(x int) int {
-	if is_power_of_2(x) {
+// next_power_of_two returns the next power of 2 >= x.
+pub fn next_power_of_two(x int) int {
+	if is_power_of_two(x) {
 		return x
 	}
 
@@ -39,13 +39,13 @@ pub fn zero_pad[T](x []T, length int) []T {
 	return r
 }
 
-// zero_pad_2 returns zero_pad of x, with the length as the next power of 2 >= len(x).
-pub fn zero_pad_2(x []complex.Complex) []complex.Complex {
-	return zero_pad[complex.Complex](x, next_power_of_2(x.len))
+// zero_pad_two returns zero_pad of x, with the length as the next power of 2 >= x.len.
+pub fn zero_pad_two(x []complex.Complex) []complex.Complex {
+	return zero_pad[complex.Complex](x, next_power_of_two(x.len))
 }
 
-// to_complex_2 returns the complex equivalent of the real-valued matrix.
-pub fn to_complex_2(x [][]f64) [][]complex.Complex {
+// to_complex_2d returns the complex equivalent of the real-valued matrix.
+pub fn to_complex_2d(x [][]f64) [][]complex.Complex {
 	mut y := [][]complex.Complex{len: x.len}
 	for n, v in x {
 		y[n] = to_complex(v)
@@ -53,7 +53,7 @@ pub fn to_complex_2(x [][]f64) [][]complex.Complex {
 	return y
 }
 
-// segment returns segs equal-length slices that are segments of x with noverlap% of overlap.
+// segment returns equal-length slices that are segments of x with noverlap% of overlap.
 // The returned slices are not copies of x, but slices into it.
 // Trailing entries in x that cannot be included in the equal-length segments are discarded.
 // noverlap is a percentage, thus 0 <= noverlap <= 1, and noverlap = 0.5 is 50% overlap.

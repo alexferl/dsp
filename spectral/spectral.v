@@ -2,7 +2,7 @@
 module spectral
 
 // segment x segmented into segments of length size with specified noverlap.
-// Number of segments returned is (len(x) - size) / (size - noverlap) + 1.
+// Number of segments returned is (x.len - size) / (size - noverlap) + 1.
 pub fn segment(x []f64, size int, noverlap int) [][]f64 {
 	stride := size - noverlap
 	lx := x.len

@@ -8,8 +8,8 @@ import window
 
 pub struct PwelchOptions {
 	// nfft is the number of data points used in each block for the FFT. Must be
-	// even; a power 2 is most efficient. This should *NOT* be used to get zero
-	// padding, or the scaling of the result will be incorrect. Use Pad for
+	// even; a power of 2 is most efficient. This should *NOT* be used to get zero
+	// padding, or the scaling of the result will be incorrect. Use pad for
 	// this instead.
 	//
 	// The default value is 256.
@@ -42,9 +42,9 @@ pub struct PwelchOptions {
 }
 
 // pwelch estimates the power spectral density of x using Welch's method.
-// Fs is the sampling frequency (samples per time unit) of x. Fs is used
-// to calculate freqs.
-// Returns the power spectral density Pxx and corresponding frequencies freqs.
+// fs is the sampling frequency (samples per time unit) of x. fs is used
+// to calculate frequencies.
+// Returns the power spectral density pxx and corresponding frequencies.
 // Designed to be similar to the matplotlib implementation below.
 // Reference: http://matplotlib.org/api/mlab_api.html#matplotlib.mlab.psd
 // See also: http://www.mathworks.com/help/signal/ref/pwelch.html

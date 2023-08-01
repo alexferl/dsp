@@ -1,3 +1,4 @@
+// Module window provides window functions for digital signal processing.
 module window
 
 import math

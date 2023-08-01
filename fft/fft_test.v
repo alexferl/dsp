@@ -184,8 +184,80 @@ struct FFT2Test {
 }
 
 const fft2_tests = [
-	FFT2Test{},
+	// vfmt off
+	FFT2Test{
+		[
+			[f64(1), 2, 3]
+			[f64(3), 4, 5]
+		],
+		[
+			[complex.complex(18, 0), complex.complex(-3, 1.73205081), complex.complex(-3, -1.73205081)]
+			[complex.complex(-6, 0), complex.complex(0, 0), complex.complex(0, 0)]
+		]
+	},
+	FFT2Test{
+		[
+			[f64(0.1), 0.2, 0.3, 0.4, 0.5]
+			[f64(1), 2, 3, 4, 5]
+			[f64(3), 2, 1, 0, -1]
+		],
+		[
+			[complex.complex(21.5, 0), complex.complex(-0.25, 0.34409548), complex.complex(-0.25, 0.08122992), complex.complex(-0.25, -0.08122992), complex.complex(-0.25, -0.34409548)]
+			[complex.complex(-8.5, -8.66025404), complex.complex(5.70990854, 4.6742225), complex.complex(1.15694356, 4.41135694), complex.complex(-1.65694356, 4.24889709), complex.complex(-6.20990854, 3.98603154)]
+			[complex.complex(-8.5, 8.66025404), complex.complex(-6.20990854, -3.98603154), complex.complex(-1.65694356, -4.24889709), complex.complex(1.15694356, -4.41135694), complex.complex(5.70990854, -4.6742225)]
+		]
+	}
+	// vfmt on
 ]
+
+fn test_fft2() {
+	tol := 1e-8
+	for t in fft.fft2_tests {
+		v := fft2_real(t.inp)
+		assert utils.equal_approx_2d_complex(v, t.out, tol), 'fft2 error\ninput: ${t.inp}\noutput: ${v}\nexpected: ${t.out}'
+
+		vi := ifft2_real(t.out)
+		assert utils.equal_approx_2d_complex(vi, utils.to_complex_2d(t.inp), tol), 'ifft2 error\ninput: ${t.out}\noutput: ${vi}\nexpected: ${utils.to_complex_2d(t.inp)}'
+	}
+}
+
+struct FFTNTest {
+	inp []f64
+	dim []int
+	out []complex.Complex
+}
+
+const fftn_tests = [
+	// vfmt off
+	FFTNTest{
+			[
+				f64(4), 2, 3, 8, 5, 6, 7, 2, 13, 24, 13, 17
+			]
+			[
+				int(2), 2, 3
+			]
+			[
+				complex.complex(104, 0), complex.complex(12.5, 14.72243186), complex.complex(12.5, -14.72243186)
+				complex.complex(-42, 0), complex.complex(-10.5, 6.06217783), complex.complex(-10.5, -6.06217783)
+				complex.complex(-48, 0), complex.complex(-4.5, -11.25833025), complex.complex(-4.5, 11.25833025)
+				complex.complex(22, 0), complex.complex(8.5, -6.06217783), complex.complex(8.5, 6.06217783)
+			]
+	}
+	// vfmt on
+]
+
+fn test_fftn() {
+	tol := 1e-8
+	for t in fft.fftn_tests {
+		m := utils.new_matrix(utils.to_complex(t.inp), t.dim)
+		o := utils.new_matrix(t.out, t.dim)
+		v := fftn(m)
+		assert v.equal_approx(o, tol), 'fftn error\ninput: ${m}\noutput: ${v}\nexpected: ${o}'
+
+		vi := ifftn(o)
+		assert vi.equal_approx(m, tol), 'ifftn error\ninput: ${o}\noutput: ${vi}\nexpected: ${m}'
+	}
+}
 
 struct ReverseBitsTest {
 	inp u32

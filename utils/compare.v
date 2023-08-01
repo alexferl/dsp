@@ -35,7 +35,7 @@ pub fn equal_approx_complex(a []complex.Complex, b []complex.Complex, tol f64) b
 	return true
 }
 
-// equal_approx_2d returns true when the 2d slices have equal lengths and
+// equal_approx_2d returns true when the two-dimensional slices have equal lengths and
 // all element pairs have an absolute tolerance less than tol.
 pub fn equal_approx_2d(a [][]f64, b [][]f64, tol f64) bool {
 	if a.len != b.len {
@@ -51,7 +51,7 @@ pub fn equal_approx_2d(a [][]f64, b [][]f64, tol f64) bool {
 	return true
 }
 
-// equal_approx_2d_complex returns true when the 2d slices have equal lengths and
+// equal_approx_2d_complex returns true when the two-dimensional slices have equal lengths and
 // all element pairs have an absolute tolerance less than tol.
 pub fn equal_approx_2d_complex(a [][]complex.Complex, b [][]complex.Complex, tol f64) bool {
 	if a.len != b.len {

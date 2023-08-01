@@ -1,3 +1,4 @@
+// module fft provides forward and inverse fast Fourier transform functions.
 module fft
 
 import arrays
@@ -15,7 +16,7 @@ pub fn fft(x []complex.Complex) []complex.Complex {
 	}
 
 	mut r := new_radix2()
-	if utils.is_power_of_2(lx) {
+	if utils.is_power_of_two(lx) {
 		return r.fft(x)
 	}
 
@@ -70,18 +71,18 @@ pub fn convolve(x []complex.Complex, y []complex.Complex) []complex.Complex {
 	return ifft(r)
 }
 
-// fft2 returns the 2-dimensional, forward FFT of the complex-valued matrix.
+// fft2 returns the two-dimensional, forward FFT of the complex-valued matrix.
 pub fn fft2(x [][]complex.Complex) [][]complex.Complex {
 	return compute_fft2(x, fft)
 }
 
-// fft2real returns the 2-dimensional, forward FFT of the real-valued matrix.
-pub fn fft2real(x [][]f64) [][]complex.Complex {
-	return fft2(utils.to_complex_2(x))
+// fft2_real returns the two-dimensional, forward FFT of the real-valued matrix.
+pub fn fft2_real(x [][]f64) [][]complex.Complex {
+	return fft2(utils.to_complex_2d(x))
 }
 
-// ifft2real returns the 2-dimensional, inverse FFT of the real-valued matrix.
-pub fn ifft2real(x [][]complex.Complex) [][]complex.Complex {
+// ifft2_real returns the two-dimensional, inverse FFT of the real-valued matrix.
+pub fn ifft2_real(x [][]complex.Complex) [][]complex.Complex {
 	return compute_fft2(x, ifft)
 }
 
@@ -133,11 +134,11 @@ fn compute_fttn(m utils.Matrix, f fn ([]complex.Complex) []complex.Complex) util
 	mut t := m.copy()
 	mut r := utils.new_empty_matrix(dims)
 
-	for n in dims {
+	for n, _ in dims {
 		dims[n] -= 1
 	}
 
-	for n in dims {
+	for n, _ in dims {
 		mut d := []int{len: dims.len}
 		arrays.copy[int](mut d, dims)
 		d[n] = -1
@@ -145,7 +146,7 @@ fn compute_fttn(m utils.Matrix, f fn ([]complex.Complex) []complex.Complex) util
 		for {
 			r.set_dim(f(t.dim(d)), d)
 
-			if !decr_dim(mut d, dims) {
+			if !decrement_dim(mut d, dims) {
 				break
 			}
 		}
@@ -156,10 +157,11 @@ fn compute_fttn(m utils.Matrix, f fn ([]complex.Complex) []complex.Complex) util
 	return t
 }
 
-// decr_dim decrements an element of x by 1, skipping all -1s, and wrapping up to d.
-// If a value is 0, it will be reset to its corresponding value in d, and will carry one from the next non -1 value to the right.
+// decrement_dim decrements an element of x by 1, skipping all -1s, and wrapping up to d.
+// If a value is 0, it will be reset to its corresponding value in d, and will carry one
+// from the next non -1 value to the right.
 // Returns true if decremented, else false.
-fn decr_dim(mut x []int, d []int) bool {
+fn decrement_dim(mut x []int, d []int) bool {
 	for n, v in x {
 		if v == -1 {
 			continue

@@ -13,7 +13,7 @@ mut:
 }
 
 // new_matrix returns a new Matrix populated with x having dimensions dims.
-// For example, to create a 3-dimensional Matrix with 2 components, 3 rows, and 4 columns:
+// For example, to create a three-dimensional Matrix with 2 components, 3 rows, and 4 columns:
 //   new_matrix([]complex.Complex {
 //     1, 2, 3, 4,
 //     5, 6, 7, 8,
@@ -42,11 +42,7 @@ pub fn new_matrix(x []complex.Complex, dims []int) Matrix {
 
 	mut dc := []int{len: dims.len}
 	arrays.copy[int](mut dc, dims)
-	return Matrix{
-		list: x
-		dims: dc
-		offsets: offsets
-	}
+	return Matrix{x, dc, offsets}
 }
 
 // new_matrix_2d is a helper function to convert a 2d array to a matrix.
@@ -76,11 +72,7 @@ pub fn new_empty_matrix(dims []int) Matrix {
 
 // copy returns a new copy of m.
 pub fn (m Matrix) copy() Matrix {
-	mut r := Matrix{
-		list: m.list
-		dims: m.dims
-		offsets: m.offsets
-	}
+	mut r := Matrix{m.list, m.dims, m.offsets}
 	r.list = []complex.Complex{len: m.list.len}
 	arrays.copy[complex.Complex](mut r.list, m.list)
 	return r
@@ -146,9 +138,9 @@ pub fn (m Matrix) dimensions() []int {
 // dim returns the array of any given index of the Matrix.
 // Exactly one value in dims must be -1. This is the array dimension returned.
 // For example, using the Matrix documented in new_matrix:
-//   m.dim([]int {1, 0, -1}) = []complex.Complex {3, 4, 5, 6}
-//   m.dim([]int {0, -1, 2}) = []complex.Complex {3, 7, 1}
-//   m.dim([]int {-1, 1, 3}) = []complex.Complex {8, 0}
+//   m.dim([int(1), 0, -1]) = [complex.complex {3, 4, 5, 6}
+//   m.dim([int(0), -1, 2]) = []complex.Complex {3, 7, 1}
+//   m.dim([int(-1), 1, 3]) = []complex.Complex {8, 0}
 pub fn (m Matrix) dim(dims []int) []complex.Complex {
 	inds := m.indexes(dims)
 	mut r := []complex.Complex{len: inds.len}
@@ -171,22 +163,22 @@ pub fn (mut m Matrix) set_dim(x []complex.Complex, dims []int) {
 }
 
 // value returns the value at the given index.
-// m.value([]int {1, 2, 3, 4}) is equivalent to m[1][2][3][4].
+// m.value([int(1), 2, 3, 4]) is equivalent to m[1][2][3][4].
 pub fn (m Matrix) value(dims []int) complex.Complex {
 	return m.list[m.offset(dims)]
 }
 
 // set_value sets the value at the given index.
-// m.set_value(10, []int {1, 2, 3, 4}) is equivalent to m[1][2][3][4] = 10.
+// m.set_value(10, [int(1), 2, 3, 4]) is equivalent to m[1][2][3][4] = 10.
 pub fn (mut m Matrix) set_value(x complex.Complex, dims []int) {
 	m.list[m.offset(dims)] = x
 }
 
-// to_2d returns the 2-D array equivalent of the Matrix.
-// Only works on Matrixes of 2 dimensions.
+// to_2d returns the two-dimensional array equivalent of the Matrix.
+// Only works on matrices of two dimensions.
 pub fn (m Matrix) to_2d() [][]complex.Complex {
 	if m.dims.len != 2 {
-		panic('can only convert 2d Matrixes')
+		panic('can only convert two-dimensional matrices')
 	}
 
 	mut r := [][]complex.Complex{len: m.dims[0]}
@@ -198,7 +190,7 @@ pub fn (m Matrix) to_2d() [][]complex.Complex {
 	return r
 }
 
-// equal_approx returns true if the Matrixes are very close, else false.
+// equal_approx returns true if the matrices are very close, else false.
 // Comparison done using utils.equal_approx_complex().
 pub fn (m Matrix) equal_approx(n Matrix, tol f64) bool {
 	for i, v in m.dims {

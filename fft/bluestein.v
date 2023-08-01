@@ -60,7 +60,7 @@ fn (b Bluestein) has_factors(idx int) bool {
 
 fn (mut b Bluestein) fft(x []complex.Complex) []complex.Complex {
 	lx := x.len
-	mut a := utils.zero_pad[complex.Complex](x, utils.next_power_of_2(lx * 2 - 1))
+	mut a := utils.zero_pad[complex.Complex](x, utils.next_power_of_two(lx * 2 - 1))
 	la := a.len
 	factors, inv_factors := b.get_factors(lx)
 
