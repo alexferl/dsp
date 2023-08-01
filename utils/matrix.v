@@ -1,7 +1,7 @@
 module utils
 
-import math.complex
 import arrays
+import math.complex
 
 // Matrix is a multidimensional matrix of arbitrary size and dimension.
 // It cannot be resized after creation. Arrays in any axis can be set or fetched.

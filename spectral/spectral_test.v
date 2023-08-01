@@ -9,10 +9,11 @@ struct SegmentTest {
 }
 
 const segment_tests = [
+	// vfmt off
 	SegmentTest{4, 0, [[f64(1), 2, 3, 4], [f64(5), 6, 7, 8]]},
 	SegmentTest{4, 1, [[f64(1), 2, 3, 4], [f64(5), 6, 7, 8], [f64(7), 8, 9, 10]]},
-	SegmentTest{4, 2, [[f64(1), 2, 3, 4], [f64(3), 4, 5, 6], [f64(5), 6, 7, 8],
-		[f64(7), 8, 9, 10]]},
+	SegmentTest{4, 2, [[f64(1), 2, 3, 4], [f64(3), 4, 5, 6], [f64(5), 6, 7, 8], [f64(7), 8, 9, 10]]},
+	// vfmt on
 ]
 
 fn test_segment() {

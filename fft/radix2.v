@@ -2,8 +2,8 @@ module fft
 
 import math
 import math.complex
-import sync
 import runtime
+import sync
 
 [noinit]
 struct Radix2 {
