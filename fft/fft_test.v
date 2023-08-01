@@ -1,5 +1,6 @@
 module fft
 
+import benchmark
 import math
 import math.complex
 import utils
@@ -278,4 +279,25 @@ fn test_reverse_bits() {
 		v := reverse_bits(t.inp, t.sz)
 		assert v == t.out, 'input: ${t.inp} size: ${t.sz} output: ${v} expected: ${t.out}'
 	}
+}
+
+fn test_benchmark_fft() {
+	mut bmark := benchmark.new_benchmark()
+	bmark.set_total_expected_steps(10)
+	for i := 0; i < bmark.nexpected_steps; i++ {
+		big_n := 1 << 20
+		mut a := []complex.Complex{len: big_n}
+		for j := 0; j < big_n; j++ {
+			a[j] = complex.complex(f64(j) / f64(big_n), 0)
+		}
+
+		mut r := new_radix2()
+		r.get_factors(big_n)
+
+		bmark.step()
+		fft(a)
+		bmark.ok()
+	}
+	bmark.stop()
+	bmark.measure(@FN)
 }
